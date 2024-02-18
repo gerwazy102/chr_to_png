@@ -12,7 +12,8 @@ nes-chr-to-bitmap --chr_file <CHR_FILE> --palette <PALETTE> --out_file <OUT_FILE
 * `--chr_file`: Path to the NES CHR file in text format.
 * `--palette`: Palette numbers (space-separated).
 * `--out_file`: Output PNG file.
-
+* `--palette_type`: Palette type - There are multiple palettes for different versions of NES. Choose you favourite! (Default: "2C05-99")
+  
 ## Input File Format
 
 The input CHR file should be in text format. The simplest way to create this file is to open a NES game in FCEUX, access the PPU debug, and copy the 0x0000 to 0x0FFF memory region to a text file.

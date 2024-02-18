@@ -1,7 +1,7 @@
 // App based on following resources:
 // https://www.nesdev.org/wiki/PPU_pattern_tables
 
-use std::fs::{self};
+use std::{error::Error, fs};
 
 use clap::Parser;
 use image::{DynamicImage, GenericImage};
@@ -26,6 +26,10 @@ struct Args {
     /// Output png file
     #[arg(short, long)]
     out_file: String,
+
+    /// Palette type - there were a lot of NES versions with slightly different colors. Select your favourite.
+    #[arg(short = 't', long, default_value = "2C05-99")]
+    palette_type: String,
 }
 
 fn main() {
@@ -39,7 +43,25 @@ fn main() {
     }
     // Here we have vector where each value is one palette color
     let nes_palette_vec = nes_chr_to_palette_vec(nes_chr_bytes);
-    let colors = nes_palette_vec_to_colors(nes_palette_vec, palette);
+
+    let create_result =
+        create_tile_image_from_colors(nes_palette_vec, palette, args.palette_type, args.out_file);
+    match create_result {
+        Ok(()) => {}
+        Err(err) => {
+            eprintln!("Error: {}", err);
+            std::process::exit(1);
+        }
+    }
+}
+
+fn create_tile_image_from_colors(
+    nes_palette_vec: Vec<u8>,
+    nes_palette: [u8; 4],
+    nes_palette_type: String,
+    out_file: String,
+) -> Result<(), Box<dyn Error>> {
+    let colors = nes_palette_vec_to_colors(nes_palette_vec, nes_palette, nes_palette_type)?;
     let mut image = DynamicImage::new_rgb8(128, 128);
 
     // each tile has 64 pixels as 8x8 so each iteration is one tile
@@ -56,8 +78,8 @@ fn main() {
             }
         }
     }
-
-    image.save(args.out_file).expect("Failed to save image");
+    image.save(out_file).expect("Failed to save image");
+    Ok(())
 }
 
 // Parse a space-separated string into a [u8; 4]
@@ -82,13 +104,17 @@ fn parse_palette(palette_str: &str) -> [u8; 4] {
     result
 }
 
-fn nes_palette_vec_to_colors(nes_palette_vec: Vec<u8>, palette: [u8; 4]) -> Vec<image::Rgba<u8>> {
+fn nes_palette_vec_to_colors(
+    nes_palette_vec: Vec<u8>,
+    palette: [u8; 4],
+    palette_type: String,
+) -> Result<Vec<image::Rgba<u8>>, Box<dyn Error>> {
     let mut pixels: Vec<image::Rgba<u8>> = Vec::with_capacity(128 * 128);
-    for &n in nes_palette_vec.iter() {
-        pixels.push(palette::nes_to_rgb(palette[n as usize] as usize));
+    for &n in &nes_palette_vec {
+        let color = palette::nes_to_rgb(palette[n as usize] as usize, palette_type.clone())?;
+        pixels.push(color);
     }
-
-    pixels
+    Ok(pixels)
 }
 
 fn nes_chr_to_palette_vec(chr_bytes: Vec<u8>) -> Vec<u8> {
