@@ -28,7 +28,7 @@ struct Args {
     out_file: String,
 
     /// Palette type - there were a lot of NES versions with slightly different colors. Select your favourite.
-    #[arg(short = 't', long, default_value = "2C05-99")]
+    #[arg(short = 't', long, default_value = "2C07")]
     palette_type: String,
 }
 
