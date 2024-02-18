@@ -48,5 +48,7 @@ nes-chr-to-bitmap --chr_file path/to/chr_file.txt --palette "0x0D 0x27 0x17 0x06
 
 This converter is based on resources from [NESdev Wiki](https://www.nesdev.org/wiki/PPU_pattern_tables).
 
+You can easily create custom palettes using [THIS](https://github.com/Gumball2415/palgen-persune) awesome tool!
+
 License
 This converter is licensed under the MIT License. See the LICENSE file for details.
