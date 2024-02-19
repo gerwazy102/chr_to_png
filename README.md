@@ -25,8 +25,8 @@ nes-chr-to-bitmap --chr_file <CHR_FILE> --palette <PALETTE> --out_file <OUT_FILE
 ```
 
 * `--chr_file`: Path to the NES CHR file in text format.
-* `--palette`: Palette numbers (space-separated). NES hex palette numbers
-* `--out_file`: Output PNG file.
+* `--palette`: Palette numbers (space-separated). You can pass --palette multiple times to generate more png files. NES hex palette numbers
+* `--out_file-prefix`: Output prefix. `png` will be added automatically
 * `--palette_type`: Palette type - There are multiple palettes for different versions of NES. Choose you favourite! (Default: "2C07")
   
 ## Input File Format
@@ -36,7 +36,7 @@ The input CHR file should be in text format. The simplest way to create this fil
 ## Example
 
 ```bash
-nes-chr-to-bitmap --chr_file path/to/chr_file.txt --palette "0x0D 0x27 0x17 0x06" --out_file path/to/output.png
+nes-chr-to-bitmap --chr_file path/to/chr_file.txt --palette "0x0D 0x27 0x17 0x06" --out_file path/to/output_name
 ```
 
 ## Notes

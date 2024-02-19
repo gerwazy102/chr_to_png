@@ -21,11 +21,11 @@ struct Args {
 
     /// Palette numbers - space separated
     #[arg(short, long)]
-    palette: String,
+    palette: Vec<String>,
 
     /// Output png file
     #[arg(short, long)]
-    out_file: String,
+    out_file_prefix: String,
 
     /// Palette type - there were a lot of NES versions with slightly different colors. Select your favourite.
     #[arg(short = 't', long, default_value = "2C07")]
@@ -34,23 +34,27 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let palette = parse_palette(&args.palette);
     let data = get_file_as_string(&args.chr_file).expect("Failed to read file");
     let nes_chr_bytes = string_data_to_bytes(data).expect("Failed to parse chr txt file");
     if nes_chr_bytes.len() != 0x1000 {
         println!("Input CHR data MUST be exactly 4096 bytes long!");
         println!("Please make sure that you are dumping 0x0000 to 0x0FFF or 0x1000 to 0x1FFF");
     }
-    // Here we have vector where each value is one palette color
     let nes_palette_vec = nes_chr_to_palette_vec(nes_chr_bytes);
 
-    let create_result =
-        create_tile_image_from_colors(nes_palette_vec, palette, args.palette_type, args.out_file);
-    match create_result {
-        Ok(()) => {}
-        Err(err) => {
-            eprintln!("Error: {}", err);
-            std::process::exit(1);
+    for (i, p) in args.palette.iter().enumerate() {
+        let create_result = create_tile_image_from_colors(
+            nes_palette_vec.clone(),
+            parse_palette(&p),
+            args.palette_type.clone(),
+            format!("{}_{}.png", args.out_file_prefix, i),
+        );
+        match create_result {
+            Ok(()) => {}
+            Err(err) => {
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
+            }
         }
     }
 }
